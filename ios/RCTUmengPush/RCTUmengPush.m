@@ -6,16 +6,13 @@
 //  Copyright © 2016年 react-native-umeng-push. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "RCTUmengPush.h"
-#import "UMessage.h"
-#import "RCTEventDispatcher.h"
+#import "RCTLog.h"
 
-#define UMSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
-#define _IPHONE80_ 80000
 
 static NSString * const DidReceiveMessage = @"DidReceiveMessage";
 static NSString * const DidOpenMessage = @"DidOpenMessage";
+
 static RCTUmengPush *_instance = nil;
 
 @interface RCTUmengPush ()
@@ -24,7 +21,12 @@ static RCTUmengPush *_instance = nil;
 @implementation RCTUmengPush
 
 @synthesize bridge = _bridge;
-RCT_EXPORT_MODULE()
+
+RCT_EXPORT_MODULE();
+
+- (NSArray<NSString *> *)supportedEvents {
+    return @[DidReceiveMessage,DidOpenMessage];
+}
 
 + (instancetype)sharedInstance {
     static dispatch_once_t onceToken;
@@ -68,11 +70,12 @@ RCT_EXPORT_MODULE()
 }
 
 - (void)didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    [self.bridge.eventDispatcher sendAppEventWithName:DidReceiveMessage body:userInfo];
+//    RCTLog();
+    [self sendEventWithName:DidReceiveMessage body:userInfo];
 }
 
 - (void)didOpenRemoteNotification:(NSDictionary *)userInfo {
-    [self.bridge.eventDispatcher sendAppEventWithName:DidOpenMessage body:userInfo];
+    [self sendEventWithName:DidOpenMessage body:userInfo];
 }
 
 RCT_EXPORT_METHOD(setAutoAlert:(BOOL)value) {
@@ -86,6 +89,21 @@ RCT_EXPORT_METHOD(getDeviceToken:(RCTResponseSenderBlock)callback) {
     }
     callback(@[deviceToken]);
 }
+RCT_REMAP_METHOD(setAlias,
+                 alias:(NSString *)alias
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject
+                 ) {
+
+    [UMessage setAlias:alias type:kUMessageAliasTypeSina response:^(id responseObject, NSError *error) {
+        if(error == nil) {
+            resolve(responseObject);
+        } else {
+            reject(@1, @"set alias failed", error);
+        }
+    }];
+    
+}
 
 /**
  *  初始化UM的一些配置
@@ -94,55 +112,29 @@ RCT_EXPORT_METHOD(getDeviceToken:(RCTResponseSenderBlock)callback) {
     [UMessage setAutoAlert:NO];
 }
 
-+ (void)registerWithAppkey:(NSString *)appkey launchOptions:(NSDictionary *)launchOptions {
++ (void)registerWithAppkey:(NSString *)appkey launchOptions:(NSDictionary *)launchOptions{
     //set AppKey and LaunchOptions
     [UMessage startWithAppkey:appkey launchOptions:launchOptions];
     
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
-    if(UMSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
-    {
-        //register remoteNotification types
-        UIMutableUserNotificationAction *action1 = [[UIMutableUserNotificationAction alloc] init];
-        action1.identifier = @"action1_identifier";
-        action1.title=@"Accept";
-        action1.activationMode = UIUserNotificationActivationModeForeground;//当点击的时候启动程序
-        
-        UIMutableUserNotificationAction *action2 = [[UIMutableUserNotificationAction alloc] init];  //第二按钮
-        action2.identifier = @"action2_identifier";
-        action2.title=@"Reject";
-        action2.activationMode = UIUserNotificationActivationModeBackground;//当点击的时候不启动程序，在后台处理
-        action2.authenticationRequired = YES;//需要解锁才能处理，如果action.activationMode = UIUserNotificationActivationModeForeground;则这个属性被忽略；
-        action2.destructive = YES;
-        
-        UIMutableUserNotificationCategory *categorys = [[UIMutableUserNotificationCategory alloc] init];
-        categorys.identifier = @"category1";//这组动作的唯一标示
-        [categorys setActions:@[action1,action2] forContext:(UIUserNotificationActionContextDefault)];
-        
-        UIUserNotificationSettings *userSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert
-                                                                                     categories:[NSSet setWithObject:categorys]];
-        [UMessage registerRemoteNotificationAndUserNotificationSettings:userSettings];
-        
-    }
-    else{
-        //register remoteNotification types
-        [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
-         |UIRemoteNotificationTypeSound
-         |UIRemoteNotificationTypeAlert];
-    }
-#else
+    //注册通知，如果要使用category的自定义策略，可以参考demo中的代码。
+    [UMessage registerForRemoteNotifications];
     
-    //register remoteNotification types
-    [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
-     |UIRemoteNotificationTypeSound
-     |UIRemoteNotificationTypeAlert];
+//    //iOS10必须加下面这段代码。
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate=self;
     
-#endif
-    
-    //由推送第一次打开应用时
-    if(launchOptions[@"UIApplicationLaunchOptionsRemoteNotificationKey"]) {
-        [self didReceiveRemoteNotificationWhenFirstLaunchApp:launchOptions[@"UIApplicationLaunchOptionsRemoteNotificationKey"]];
-    }
-    
+    UNAuthorizationOptions types10=UNAuthorizationOptionBadge|  UNAuthorizationOptionAlert|UNAuthorizationOptionSound;
+    [center requestAuthorizationWithOptions:types10  completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (granted) {
+            //点击允许
+            //这里可以添加一些自己的逻辑
+            NSLog(@"点击允许");
+        } else {
+            //点击不允许
+            //这里可以添加一些自己的逻辑
+            NSLog(@"点击不允许");
+        }
+    }];
 #ifdef DEBUG
     [UMessage setLogEnabled:YES];
 #endif
@@ -178,5 +170,34 @@ RCT_EXPORT_METHOD(getDeviceToken:(RCTResponseSenderBlock)callback) {
         }
     });
 }
+//iOS10新增：处理前台收到通知的代理方法
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler{
+    NSDictionary * userInfo = notification.request.content.userInfo;
+    if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        //应用处于前台时的远程推送接受
+        //关闭友盟自带的弹出框
+        [UMessage setAutoAlert:NO];
+        //必须加这句代码
+        [UMessage didReceiveRemoteNotification:userInfo];
+        
+    }else{
+        //应用处于前台时的本地推送接受
+    }
+    //当应用处于前台时提示设置，需要哪个可以设置哪一个
+    completionHandler(UNNotificationPresentationOptionSound|UNNotificationPresentationOptionBadge|UNNotificationPresentationOptionAlert);
+}
 
+//iOS10新增：处理后台点击通知的代理方法
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler{
+    NSDictionary * userInfo = response.notification.request.content.userInfo;
+    if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        //应用处于后台时的远程推送接受
+        //必须加这句代码
+        [UMessage didReceiveRemoteNotification:userInfo];
+        
+    }else{
+        //应用处于后台时的本地推送接受
+    }
+    
+}
 @end

@@ -2,6 +2,7 @@
 
 import React, {
   NativeModules,
+  NativeEventEmitter,
   DeviceEventEmitter, //android
   NativeAppEventEmitter, //ios
   Platform,
@@ -11,14 +12,17 @@ import React, {
 const UmengPushModule = NativeModules.UmengPush;
 
 var receiveMessageSubscript, openMessageSubscription;
-
+const UmengPushEmitter = new NativeEventEmitter(UmengPushModule)
 var UmengPush = {
-
+	setAlias(alias){
+		return UmengPushModule.setAlias(alias);
+	},
   getDeviceToken(handler: Function) {
     UmengPushModule.getDeviceToken(handler);
   },
 
   didReceiveMessage(handler: Function) {
+
     receiveMessageSubscript = this.addEventListener(UmengPushModule.DidReceiveMessage, message => {
       //处于后台时，拦截收到的消息
       if(AppState.currentState === 'background') {
@@ -39,7 +43,7 @@ var UmengPush = {
       });
     }
     else {
-      return NativeAppEventEmitter.addListener(
+      return UmengPushEmitter.addListener(
         eventName, (userInfo) => {
           handler(userInfo);
         });

@@ -7,9 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "RCTBridgeModule.h"
+#import "RCTEventEmitter.h"
+#import <UserNotifications/UserNotifications.h>
+#import "UMessage.h"
 
-@interface RCTUmengPush : NSObject <RCTBridgeModule>
+
+@interface RCTUmengPush : RCTEventEmitter <RCTBridgeModule, UNUserNotificationCenterDelegate>
+
 + (void)registerWithAppkey:(NSString *)appkey launchOptions:(NSDictionary *)launchOptions;
 + (void)application:(UIApplication *)application didRegisterDeviceToken:(NSData *)deviceToken;
 + (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo;
