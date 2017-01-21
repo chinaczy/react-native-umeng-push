@@ -1,33 +1,26 @@
+
 {
   "name": "react-native-umeng-push",
-  "version": "2.0.0",
-  "private": false,
-  "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start"
-  },
-  "dependencies": {
-    "react-native-umeng-sdk": "github:OtkurBiz/react-native-umeng-sdk"
-  },
+  "version": "1.1.0",
+  "description": ".",
   "main": "UmengPush.js",
-  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/liuchungui/react-native-umeng-push.git"
+    "url": "git+https://github.com/chinaczy/react-native-umeng-push.git"
   },
   "keywords": [
-  	"react-native",
-	"umengpush",
-    "umeng",
-    "push",
-    "umeng-push",
-    "react-native",
-    "react-native-umeng-push"
+    "umeng","push"
   ],
-  "author": "liuchungui",
+  "author": "czy",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/liuchungui/react-native-umeng-push/issues"
+    "url": "https://github.com/chinaczy/react-native-umeng-push/issues"
   },
-  "homepage": "https://github.com/liuchungui/react-native-umeng-push#readme",
-  "description": ""
+  "dependencies": {
+	  "react-native-umeng-sdk": "github:OtkurBiz/react-native-umeng-sdk"
+  },
+  "homepage": "https://github.com/chinaczy/react-native-umeng-push#readme"
 }
