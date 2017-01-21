@@ -69,7 +69,7 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
     }
     @ReactMethod
     public void setAlias(String alias ){
-        PushAgent.getInstance(getCurrentActivity()).addAlias(alias, "phone", new UTrack.ICallBack() {
+        PushAgent.getInstance(getCurrentActivity()).addAlias(alias, "", new UTrack.ICallBack() {
             @Override
             public void onMessage(boolean b, String s) {
 
