@@ -6,7 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "react-native-umeng-android-sdk": "1.6.0"
+    "react-native-umeng-android-sdk": "^1.6.1"
   },
   "main": "UmengPush.js",
   "devDependencies": {},
