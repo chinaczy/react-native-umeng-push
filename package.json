@@ -20,7 +20,7 @@
     "url": "https://github.com/chinaczy/react-native-umeng-push/issues"
   },
   "dependencies": {
-    "react-native-umeng-sdk": "git://github.com/chinaczy/react-native-umeng-sdk.git"
+    "react-native-umeng-android-sdk": "1.6.0"
   },
   "homepage": "https://github.com/chinaczy/react-native-umeng-push#readme"
 }
