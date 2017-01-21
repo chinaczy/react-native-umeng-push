@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.Notification;
 import android.content.Context;
 import android.os.Handler;
+import android.support.v4.BuildConfig;
 import android.util.Log;
 
 import com.umeng.message.IUmengRegisterCallback;
@@ -44,16 +45,14 @@ public class UmengPushApplication extends Application {
     //开启推送
     private void enablePush() {
         mPushAgent = PushAgent.getInstance(this);
-        mPushAgent.enable(new IUmengRegisterCallback() {
+        mPushAgent.register(new IUmengRegisterCallback() {
             @Override
-            public void onRegistered(final String s) {
-                new Handler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.i(TAG, "enable push, registrationId = " + s);
-                        mRegistrationId = s;
-                    }
-                });
+            public void onSuccess(String s) {
+                mRegistrationId = s ;
+            }
+            @Override
+            public void onFailure(String s, String s1) {
+
             }
         });
         //统计应用启动数据
@@ -104,11 +103,8 @@ public class UmengPushApplication extends Application {
                 messageHandlerSendEvent(UmengPushModule.DidReceiveMessage, msg);
             }
         });
+        mPushAgent.setDebugMode(BuildConfig.DEBUG);
 
-        //设置debug状态
-        if(BuildConfig.DEBUG) {
-            mPushAgent.setDebugMode(true);
-        }
         //前台不显示通知
         // mPushAgent.setNotificaitonOnForeground(false);
     }

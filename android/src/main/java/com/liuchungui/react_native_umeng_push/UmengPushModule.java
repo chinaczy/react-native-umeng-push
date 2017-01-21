@@ -11,8 +11,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.umeng.message.UmengRegistrar;
+import com.umeng.message.PushAgent;
+import com.umeng.message.UTrack;
+import com.umeng.message.common.inter.ITagManager;
 import com.umeng.message.entity.UMessage;
+import com.umeng.message.tag.TagManager;
 
 import org.json.JSONObject;
 
@@ -60,10 +63,28 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
      */
     @ReactMethod
     public void getDeviceToken(Callback callback) {
-        String registrationId = UmengRegistrar.getRegistrationId(mReactContext);
+
+        String registrationId = PushAgent.getInstance(getCurrentActivity()).getRegistrationId();
         callback.invoke(registrationId == null ? mPushApplication.mRegistrationId : registrationId);
     }
-
+    @ReactMethod
+    public void setAlias(String alias ){
+        PushAgent.getInstance(getCurrentActivity()).addAlias(alias, "phone", new UTrack.ICallBack() {
+            @Override
+            public void onMessage(boolean b, String s) {
+                
+            }
+        });
+    }
+    @ReactMethod
+    public void setTag(String tag){
+        PushAgent.getInstance(getReactApplicationContext()).getTagManager().add(new TagManager.TCallBack() {
+            @Override
+            public void onMessage(boolean b, ITagManager.Result result) {
+                
+            }
+        }, tag);
+    }
     private WritableMap convertToWriteMap(UMessage msg) {
         WritableMap map = Arguments.createMap();
         //遍历Json
