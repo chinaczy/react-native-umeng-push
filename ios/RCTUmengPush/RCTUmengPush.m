@@ -104,7 +104,18 @@ RCT_REMAP_METHOD(setAlias,
     }];
     
 }
-
+RCT_REMAP_METHOD(setTag:(NSString) tag){
+    [UMessage addTag:tag
+            response:^(id responseObject, NSInteger remain, NSError *error) {
+         //add your codes
+  }];
+}
+RCT_REMAP_METHOD(removeTag:(NSString) tag){
+    [UMessage removeTag:tag
+           response:^(id responseObject, NSInteger remain, NSError *error) {
+         //add your codes            
+  }];
+}
 /**
  *  初始化UM的一些配置
  */

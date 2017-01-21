@@ -72,7 +72,7 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
         PushAgent.getInstance(getCurrentActivity()).addAlias(alias, "phone", new UTrack.ICallBack() {
             @Override
             public void onMessage(boolean b, String s) {
-                
+
             }
         });
     }
@@ -81,9 +81,18 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
         PushAgent.getInstance(getReactApplicationContext()).getTagManager().add(new TagManager.TCallBack() {
             @Override
             public void onMessage(boolean b, ITagManager.Result result) {
-                
+
             }
         }, tag);
+    }
+    @ReactMethod
+    public void removeTag(String tag){
+        PushAgent.getInstance(getReactApplicationContext()).getTagManager().delete(new TagManager.TCallBack() {
+            @Override
+            public void onMessage(boolean b, ITagManager.Result result) {
+
+            }
+        },tag);
     }
     private WritableMap convertToWriteMap(UMessage msg) {
         WritableMap map = Arguments.createMap();

@@ -17,10 +17,16 @@ var UmengPush = {
 	setAlias(alias){
 		return UmengPushModule.setAlias(alias);
 	},
+  setTag(tag){
+    UmengPushModule.setTag(tag);
+  }
+  removeTag(tag){
+    UmengPushModule.removeTag(tag);
+  }
   getDeviceToken(handler: Function) {
     UmengPushModule.getDeviceToken(handler);
   },
-
+￼
   didReceiveMessage(handler: Function) {
 
     receiveMessageSubscript = this.addEventListener(UmengPushModule.DidReceiveMessage, message => {
