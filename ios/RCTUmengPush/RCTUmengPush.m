@@ -104,13 +104,13 @@ RCT_REMAP_METHOD(setAlias,
     }];
     
 }
-RCT_REMAP_METHOD(setTag:(NSString) tag){
+RCT_EXPORT_METHOD(setTag:(NSString *) tag){
     [UMessage addTag:tag
             response:^(id responseObject, NSInteger remain, NSError *error) {
          //add your codes
   }];
 }
-RCT_REMAP_METHOD(removeTag:(NSString) tag){
+RCT_EXPORT_METHOD(removeTag:(NSString*) tag){
     [UMessage removeTag:tag
            response:^(id responseObject, NSInteger remain, NSError *error) {
          //add your codes            
@@ -120,7 +120,7 @@ RCT_REMAP_METHOD(removeTag:(NSString) tag){
  *  初始化UM的一些配置
  */
 - (void)setupUMessage {
-    [UMessage setAutoAlert:NO];
+    [UMessage setAutoAlert:YES];
 }
 
 + (void)registerWithAppkey:(NSString *)appkey launchOptions:(NSDictionary *)launchOptions{
@@ -187,7 +187,7 @@ RCT_REMAP_METHOD(removeTag:(NSString) tag){
     if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
         //应用处于前台时的远程推送接受
         //关闭友盟自带的弹出框
-        [UMessage setAutoAlert:NO];
+        [UMessage setAutoAlert:YES];
         //必须加这句代码
         [UMessage didReceiveRemoteNotification:userInfo];
         
