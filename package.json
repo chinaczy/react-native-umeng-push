@@ -20,7 +20,7 @@
     "url": "https://github.com/chinaczy/react-native-umeng-push/issues"
   },
   "dependencies": {
-    "react-native-umeng-sdk": "github:OtkurBiz/react-native-umeng-sdk"
+    "react-native-umeng-sdk": "git+https://github.com/chinaczy/react-native-umeng-sdk.git"
   },
   "homepage": "https://github.com/chinaczy/react-native-umeng-push#readme"
 }
